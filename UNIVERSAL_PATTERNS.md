@@ -1,10 +1,10 @@
-# Universal WinForms + SQL Patterns
+# Универсальные шаблоны WinForms + SQL Server
 
-This file is a quick adaptation guide for exam tasks where the database changes, but the coding logic stays almost the same.
+Этот файл нужен как быстрая шпаргалка для экзаменационных задач, где база данных меняется, но логика написания кода остаётся почти одинаковой.
 
-## 1. Universal authorization pattern
+## 1. Универсальный шаблон авторизации
 
-Use this when you need a login form for almost any database.
+Используй этот шаблон, когда нужно сделать форму входа почти для любой базы данных.
 
 ```csharp
 using Microsoft.Data.SqlClient;
@@ -15,7 +15,7 @@ namespace MyApp
 {
     public partial class Form1 : Form
     {
-        string connectionString = @"Server=SERVER_NAME;Database=DATABASE_NAME;Integrated Security=True;TrustServerCertificate=True";
+        string connectionString = @"Server=ИМЯ_СЕРВЕРА;Database=ИМЯ_БАЗЫ;Integrated Security=True;TrustServerCertificate=True";
 
         public Form1()
         {
@@ -30,7 +30,7 @@ namespace MyApp
 
             if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Fill in all fields");
+                MessageBox.Show("Заполните все поля");
                 return;
             }
 
@@ -38,7 +38,7 @@ namespace MyApp
             {
                 conn.Open();
 
-                string query = "SELECT * FROM USERS_TABLE WHERE LOGIN_COLUMN = @login AND PASSWORD_COLUMN = @password";
+                string query = "SELECT * FROM ТАБЛИЦА_ПОЛЬЗОВАТЕЛЕЙ WHERE ПОЛЕ_ЛОГИНА = @login AND ПОЛЕ_ПАРОЛЯ = @password";
 
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
@@ -55,7 +55,7 @@ namespace MyApp
                         }
                         else
                         {
-                            MessageBox.Show("Invalid login or password");
+                            MessageBox.Show("Неверный логин или пароль");
                         }
                     }
                 }
@@ -65,9 +65,9 @@ namespace MyApp
 }
 ```
 
-## 2. Universal card loading pattern
+## 2. Универсальный шаблон загрузки карточек
 
-Use this when records must be displayed inside a `FlowLayoutPanel`.
+Используй этот шаблон, когда записи нужно выводить в `FlowLayoutPanel`.
 
 ```csharp
 private void LoadData(string query)
@@ -86,10 +86,10 @@ private void LoadData(string query)
                 UserControl1 card = new UserControl1();
 
                 card.SetData(
-                    reader["COLUMN_1"].ToString(),
-                    reader["COLUMN_2"].ToString(),
-                    reader["COLUMN_3"].ToString(),
-                    reader["COLUMN_4"].ToString()
+                    reader["ПОЛЕ_1"].ToString(),
+                    reader["ПОЛЕ_2"].ToString(),
+                    reader["ПОЛЕ_3"].ToString(),
+                    reader["ПОЛЕ_4"].ToString()
                 );
 
                 flowLayoutPanel1.Controls.Add(card);
@@ -99,105 +99,120 @@ private void LoadData(string query)
 }
 ```
 
-## 3. Universal base load
+## 3. Универсальная загрузка данных при открытии формы
 
 ```csharp
 private void Form2_Load(object sender, EventArgs e)
 {
-    string query = "SELECT * FROM TABLE_NAME";
+    string query = "SELECT * FROM ИМЯ_ТАБЛИЦЫ";
     LoadData(query);
 }
 ```
 
-If the task has related tables, replace it with a query using `JOIN`.
+Если в задаче таблицы связаны между собой, вместо простого `SELECT` нужно писать запрос с `JOIN`.
 
-## 4. Universal search pattern
+## 4. Универсальный шаблон поиска
 
 ```csharp
 private void textBoxSearch_TextChanged(object sender, EventArgs e)
 {
     string search = textBoxSearch.Text.Trim();
-    string query = "SELECT * FROM TABLE_NAME";
+    string query = "SELECT * FROM ИМЯ_ТАБЛИЦЫ";
 
     if (!string.IsNullOrEmpty(search))
-        query += " WHERE SEARCH_COLUMN LIKE '%" + search + "%'";
+        query += " WHERE ПОЛЕ_ПОИСКА LIKE '%" + search + "%'";
 
     LoadData(query);
 }
 ```
 
-Logic:
+Логика:
 
-1. read search text
-2. trim spaces
-3. if text exists, add `WHERE ... LIKE`
-4. reload cards
+1. взять текст из поля поиска
+2. убрать пробелы через `Trim()`
+3. если строка не пустая, добавить `WHERE ... LIKE`
+4. заново загрузить карточки
 
-## 5. Universal sorting pattern
+## 5. Универсальный шаблон сортировки
 
 ```csharp
 private void comboBoxSort_SelectedIndexChanged(object sender, EventArgs e)
 {
-    string query = "SELECT * FROM TABLE_NAME";
+    string query = "SELECT * FROM ИМЯ_ТАБЛИЦЫ";
 
     if (comboBoxSort.SelectedIndex == 0)
-        query += " ORDER BY SORT_COLUMN ASC";
+        query += " ORDER BY ПОЛЕ_СОРТИРОВКИ ASC";
     else if (comboBoxSort.SelectedIndex == 1)
-        query += " ORDER BY SORT_COLUMN DESC";
+        query += " ORDER BY ПОЛЕ_СОРТИРОВКИ DESC";
 
     LoadData(query);
 }
 ```
 
-Logic:
+Логика:
 
-- `ASC` = ascending
-- `DESC` = descending
+- `ASC` — по возрастанию
+- `DESC` — по убыванию
 
-## 6. Universal filtering pattern
+## 6. Универсальный шаблон фильтрации
 
 ```csharp
 private void comboBoxFilter_SelectedIndexChanged(object sender, EventArgs e)
 {
-    string query = "SELECT * FROM TABLE_NAME";
+    string query = "SELECT * FROM ИМЯ_ТАБЛИЦЫ";
 
     if (comboBoxFilter.SelectedIndex == 0)
-        query += " WHERE FILTER_COLUMN = 'VALUE_1'";
+        query += " WHERE ПОЛЕ_ФИЛЬТРА = 'ЗНАЧЕНИЕ_1'";
     else if (comboBoxFilter.SelectedIndex == 1)
-        query += " WHERE FILTER_COLUMN = 'VALUE_2'";
+        query += " WHERE ПОЛЕ_ФИЛЬТРА = 'ЗНАЧЕНИЕ_2'";
 
     LoadData(query);
 }
 ```
 
-Logic:
+Логика:
 
-- `WHERE` keeps only matching rows
-- common filters are category, status, role, type, price range, availability
+- `WHERE` оставляет только подходящие строки
+- обычно фильтруют по статусу, категории, роли, типу, наличию или диапазону цены
 
-## 7. What changes from one exam task to another
+## 7. Что меняется от одной экзаменационной задачи к другой
 
-Usually only these parts change:
+Обычно меняются только:
 
-- connection string
-- table names
-- column names
-- text shown in the card
-- filter values
-- sort column
-- search column
+- строка подключения
+- названия таблиц
+- названия столбцов
+- текст, который выводится в карточке
+- значения фильтрации
+- поле сортировки
+- поле поиска
 
-The programming logic stays the same.
+Сама логика программирования остаётся той же.
 
-## 8. Fast exam checklist
+## 8. Быстрая памятка перед экзаменом
 
-When you see a new database, answer these questions first:
+Когда видишь новую базу данных, сначала ответь на эти вопросы:
 
-1. Which table is used for login?
-2. Which columns are login and password?
-3. Which table contains the catalog data?
-4. Which columns must be shown on the card?
-5. Which column should be searchable?
-6. Which column should be sortable?
-7. Which column should be filterable?
-8. Do I need a simple `SELECT` or a `JOIN` query?
+1. Какая таблица используется для входа?
+2. Какие поля являются логином и паролем?
+3. Какая таблица содержит данные каталога?
+4. Какие поля нужно показывать в карточке?
+5. По какому полю делать поиск?
+6. По какому полю делать сортировку?
+7. По какому полю делать фильтрацию?
+8. Нужен простой `SELECT` или запрос с `JOIN`?
+
+## 9. Главная мысль
+
+На экзамене не нужно заново изобретать код под каждую новую базу.
+
+Нужно помнить один и тот же каркас:
+
+- получить данные
+- проверить данные
+- подключиться к БД
+- выполнить запрос
+- прочитать строки
+- создать карточки
+- добавить карточки на форму
+- отдельно подключить поиск, сортировку и фильтрацию

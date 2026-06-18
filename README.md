@@ -1,114 +1,127 @@
 # UniversityAppDemo
 
-Minimal WinForms demo for practice work with SQL Server and the `university` database.
+Минимальный пример WinForms-приложения для практических работ и экзамена по SQL Server на базе данных `university`.
 
-## What is in the repository
+## Что есть в репозитории
 
-- `Form1` - authorization form
-- `Form2` - main form with data cards
-- `UserControl1` - reusable card for showing a single record
-- `UNIVERSAL_PATTERNS.md` - universal templates for adapting the same logic to another database
+- `Form1` — форма авторизации
+- `Form2` — главная форма с карточками данных
+- `UserControl1` — карточка для отображения одной записи
+- `UNIVERSAL_PATTERNS.md` — универсальные шаблоны под любую похожую базу данных
 
-## What this project demonstrates
+## Что показывает этот проект
 
-This repository shows the same core exam logic that appears in many practice tasks:
+Этот репозиторий демонстрирует базовую логику, которая часто встречается на практических работах и экзамене:
 
-1. Read values from text boxes.
-2. Validate that required fields are not empty.
-3. Open a SQL Server connection.
-4. Execute a query with `SqlCommand`.
-5. Read data with `SqlDataReader`.
-6. Show records in a `FlowLayoutPanel` through a `UserControl`.
-7. Extend the catalog with search, sorting, and filtering.
+1. Получение данных из `TextBox`
+2. Проверка пустых полей
+3. Подключение к SQL Server через `SqlConnection`
+4. Выполнение запроса через `SqlCommand`
+5. Чтение результата через `SqlDataReader`
+6. Вывод записей на форму через `FlowLayoutPanel` и `UserControl`
+7. Расширение каталога поиском, сортировкой и фильтрацией
 
-## Current database used in the example
+## Какая база используется в примере
 
-The sample project is wired to:
+В проекте по умолчанию используется строка подключения:
 
 ```csharp
 Server=(localdb)\MSSQLLocalDB;Database=university;Integrated Security=True;TrustServerCertificate=True
 ```
 
-If your exam machine uses another SQL Server instance or another database name, replace the connection string in:
+Если на экзамене или на другом компьютере будет:
+
+- другой сервер
+- другое имя базы
+- другой экземпляр SQL Server
+
+то нужно заменить строку подключения в:
 
 - `Form1.cs`
 - `Form2.cs`
 
-## Authorization logic in this example
+## Как работает авторизация в этом примере
 
-For the current `university` database the project uses:
+Для текущей базы `university` используется такой вариант:
 
-- login = `email`
-- password = `idStudens`
+- логин = `email`
+- пароль = `idStudens`
 
-Example:
+Пример входа:
 
 - `anna.ivanova@zaochnik.ru`
 - `S001`
 
-## How to adapt this code to another database
+## Как адаптировать код под другую базу
 
-Usually only three things change:
+Обычно меняются только три вещи:
 
-1. Connection string
-2. Table names
-3. Column names
+1. Строка подключения
+2. Названия таблиц
+3. Названия полей
 
-The logic stays the same.
+Сама логика остаётся той же.
 
-### Universal Form1 logic
+### Универсальная логика `Form1`
 
-The authorization form always follows this pattern:
+Форма авторизации почти всегда строится так:
 
-1. Get login and password from text boxes.
-2. Check for empty values.
-3. Connect to the database.
-4. Execute a `SELECT` query.
-5. If `reader.Read()` returns `true`, open `Form2`.
-6. Otherwise show an error message.
+1. Получить логин и пароль из текстовых полей
+2. Проверить, что поля не пустые
+3. Подключиться к базе данных
+4. Выполнить `SELECT`
+5. Если `reader.Read()` вернул `true`, открыть `Form2`
+6. Иначе показать сообщение об ошибке
 
-### Universal Form2 logic
+### Универсальная логика `Form2`
 
-The main form always follows this pattern:
+Главная форма почти всегда строится так:
 
-1. Build a query.
-2. Open a connection.
-3. Execute the query.
-4. Read rows in `while (reader.Read())`.
-5. Create a new `UserControl1`.
-6. Pass values into the card method.
-7. Add the card to `flowLayoutPanel1`.
+1. Собрать SQL-запрос
+2. Открыть подключение
+3. Выполнить запрос
+4. Прочитать строки через `while (reader.Read())`
+5. Создать новый `UserControl1`
+6. Передать значения в метод карточки
+7. Добавить карточку в `flowLayoutPanel1`
 
-### Universal search logic
+### Универсальная логика поиска
 
-- read text from `TextBox`
-- use `Trim()`
-- if not empty, add `WHERE ... LIKE '%text%'`
+- взять текст из `TextBox`
+- применить `Trim()`
+- если строка не пустая, добавить `WHERE ... LIKE '%текст%'`
 
-### Universal sorting logic
+### Универсальная логика сортировки
 
-- read `SelectedIndex` from `ComboBox`
-- add `ORDER BY Column ASC`
-- or add `ORDER BY Column DESC`
+- получить `SelectedIndex` у `ComboBox`
+- добавить `ORDER BY Поле ASC`
+- или добавить `ORDER BY Поле DESC`
 
-### Universal filtering logic
+### Универсальная логика фильтрации
 
-- read `SelectedIndex` from `ComboBox`
-- add `WHERE Column = 'Value'`
+- получить `SelectedIndex` у `ComboBox`
+- добавить `WHERE Поле = 'Значение'`
 
-## Why there is a separate universal file
+## Зачем нужен отдельный универсальный файл
 
-The repository code itself is tied to the sample `university` database.
-The file `UNIVERSAL_PATTERNS.md` explains how to reuse the same coding logic for:
+Код в проекте привязан к примеру с базой `university`.
 
-- students
-- products
-- books
-- clients
-- flowers
-- any similar SQL-backed WinForms exam task
+Файл `UNIVERSAL_PATTERNS.md` нужен для другого:
 
-## Build
+- чтобы быстро адаптировать ту же логику под новую базу
+- чтобы понять, что именно меняется на экзамене
+- чтобы не учить каждый проект с нуля
+
+Он подойдёт для похожих задач:
+
+- студенты
+- товары
+- книги
+- клиенты
+- цветы
+- любые каталоги с SQL Server и WinForms
+
+## Сборка проекта
 
 ```bash
 dotnet build
